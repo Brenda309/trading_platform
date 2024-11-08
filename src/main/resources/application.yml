@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: trading
+
+  datasource:
+    password: Whatwhat45678
+    url: jdbc:postgresql://localhost:5432/trading
+    username: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
+      show-sql: true
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  level:
+    org.springframework.security: DEBUG
