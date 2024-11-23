@@ -111,8 +111,12 @@ if(!password.equals(userDetails.getPassword())) {
 }
 return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 }
-public ResponseEntity<AuthRespone> verifySignInOtp(@PathVariable String otp, @RequestParam String id ){
 
+
+@PostMapping("/two-factor/otp/{otp}")
+public ResponseEntity<AuthRespone> verifySignInOtp(
+        @PathVariable String otp,
+        @RequestParam String id ) throws MessagingException {
     TwoFactorOtp twoFactorOtp = twoFactorOtpService.findById(id);
     if(twoFactorOtpService.verifyTwoFactorOtp(twoFactorOtp, otp)){
 AuthRespone res = new AuthRespone();
@@ -123,4 +127,5 @@ return new ResponseEntity<>(res, HttpStatus.OK);
     }
  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid otp");
 }
+
 }
