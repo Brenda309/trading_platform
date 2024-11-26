@@ -1,4 +1,5 @@
 package com.trading.trading.model;
 
-public class Walllet {
+public enum OrderType {
+    BUY, SELL
 }
