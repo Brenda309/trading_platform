@@ -4,6 +4,7 @@ import com.trading.trading.model.Order;
 import com.trading.trading.model.User;
 import com.trading.trading.model.Wallet;
 import com.trading.trading.model.WalletTransaction;
+import com.trading.trading.service.OrderService;
 import com.trading.trading.service.UserService;
 import com.trading.trading.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class WallletController {
 @Autowired
     private UserService userService;
 @Autowired
-private
+private OrderService orderService;;
 
 @GetMapping("/api/wallet")
 public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) {
@@ -46,7 +47,7 @@ public ResponseEntity<Wallet> walletToWalletTranfer(@RequestHeader("Authorizatio
                                                   @RequestBody WalletTransaction req) throws Exception{
         User user = userService.findUserProfileByJwt(jwt);
 
-Order order = orderservice.getorderById(orderId);
+Order order = orderService.getOrderById(orderId);
 Wallet wallet= walletService.payOrderPayment(order, user);
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
