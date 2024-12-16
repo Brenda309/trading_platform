@@ -1,7 +1,7 @@
 package com.trading.trading.request;
 
-import com.trading.trading.model.OrderType;
-import jakarta.persistence.Entity;
+import com.trading.trading.domain.OrderType;
+import com.trading.trading.domain.USER_ROLE;
 import lombok.Data;
 
 @Data

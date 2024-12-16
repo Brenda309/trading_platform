@@ -1,7 +1,8 @@
 package com.trading.trading.service;
 
+import com.trading.trading.domain.OrderType;
+import com.trading.trading.domain.USER_ROLE;
 import com.trading.trading.model.Order;
-import com.trading.trading.model.OrderType;
 import com.trading.trading.model.User;
 import com.trading.trading.model.Wallet;
 import com.trading.trading.repository.WalletRepository;

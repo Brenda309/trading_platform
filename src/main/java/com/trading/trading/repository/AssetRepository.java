@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface AssetRepository extends JpaRepository<Asset, Long> {
     List<Asset> findByUserId(Long userId);
-    Asset findByUserIdandCoinId(Long userId, String coinId);
+    Asset findByUserIdAndCoinId(Long userId, String coinId);
 
 
 }

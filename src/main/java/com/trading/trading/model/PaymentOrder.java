@@ -1,24 +1,20 @@
 package com.trading.trading.model;
 
-
-import com.trading.trading.domain.WithdrawalStatus;
+import com.trading.trading.domain.PaymentMethod;
+import com.trading.trading.domain.PaymentOrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Data
-public class Withdrawal {
+public class PaymentOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private WithdrawalStatus status;
     private Long amount;
+    private PaymentOrderStatus status;
+private PaymentMethod paymentMethod;
 
-    @ManyToOne
+@ManyToOne
     private User user;
-    private LocalDateTime date = LocalDateTime.now();
-
-
 }

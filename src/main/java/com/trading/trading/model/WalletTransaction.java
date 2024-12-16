@@ -1,5 +1,6 @@
 package com.trading.trading.model;
 
+import com.trading.trading.domain.WalletTransactionType;
 import jakarta.persistence.*;
 import lombok.Data;
 

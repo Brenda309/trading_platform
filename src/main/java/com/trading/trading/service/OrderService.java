@@ -1,5 +1,6 @@
 package com.trading.trading.service;
 
+import com.trading.trading.domain.OrderType;
 import com.trading.trading.model.*;
 import jakarta.transaction.Transactional;
 

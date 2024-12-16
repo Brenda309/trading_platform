@@ -2,7 +2,7 @@ package com.trading.trading.service;
 
 import com.trading.trading.model.User;
 import com.trading.trading.model.Withdrawal;
-import com.trading.trading.model.WithdrawalStatus;
+import com.trading.trading.domain.WithdrawalStatus;
 import com.trading.trading.repository.WithdrawalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

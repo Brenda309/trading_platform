@@ -15,7 +15,7 @@ public class AssetServiceImpl implements AssetService {
     @Autowired
 private AssetRepository assetRepository;
     @Override
-    public Asset CreateAsset(User user, Coin coin, double quantity) {
+    public Asset createAsset(User user, Coin coin, double quantity) {
         Asset asset = new Asset();
 
         asset.setUser(user);
@@ -52,7 +52,7 @@ private AssetRepository assetRepository;
 
     @Override
     public Asset findAssetByUserIdAndCoinId(Long userId, String coinId) {
-        return assetRepository.findByUserIdandCoinId(userId, coinId);
+        return assetRepository.findByUserIdAndCoinId(userId, coinId);
     }
 
     @Override

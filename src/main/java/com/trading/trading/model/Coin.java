@@ -1,4 +1,5 @@
 package com.trading.trading.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -6,6 +7,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -62,10 +66,10 @@ public class Coin {
     private double circulatingSupply;
 
     @JsonProperty("total_supply")
-    private double totalSupply;
+    private long totalSupply;
 
     @JsonProperty("max_supply")
-    private double maxSupply;
+    private long maxSupply;
 
     @JsonProperty("ath")
     private double ath;
@@ -74,7 +78,7 @@ public class Coin {
     private double athChangePercentage;
 
     @JsonProperty("ath_date")
-    private String athDate;
+    private Date athDate;
 
     @JsonProperty("atl")
     private double atl;
@@ -86,8 +90,9 @@ public class Coin {
     private String atlDate;
 
     @JsonProperty("roi")
-    private Object roi;
+    @JsonIgnore
+    private String roi;
 
     @JsonProperty("last_updated")
-    private String lastUpdated;
+    private Date lastUpdated;
 }

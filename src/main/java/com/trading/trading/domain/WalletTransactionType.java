@@ -1,4 +1,4 @@
-package com.trading.trading.model;
+package com.trading.trading.domain;
 
 public enum WalletTransactionType {
 WITHDRAWAL,
