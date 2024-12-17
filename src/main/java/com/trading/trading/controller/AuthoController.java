@@ -3,11 +3,10 @@ package com.trading.trading.controller;
 import com.trading.trading.Config.JwtProvider;
 import com.trading.trading.model.TwoFactorOtp;
 import com.trading.trading.model.User;
+import com.trading.trading.model.Watchlist;
 import com.trading.trading.repository.UserRepository;
 import com.trading.trading.response.AuthRespone;
-import com.trading.trading.service.CustomerUserDetailsService;
-import com.trading.trading.service.EmailService;
-import com.trading.trading.service.TwoFactorOtpService;
+import com.trading.trading.service.*;
 import com.trading.trading.utils.OtpUtilis;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,9 @@ public class AuthoController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private WatchListService watchListService;
+
 @PostMapping("/signup")
     public ResponseEntity<AuthRespone> register(@RequestBody User user) {
 
@@ -46,7 +48,7 @@ if (isEmailExist != null) {
     newUser.setPassword(user.getPassword());
     newUser.setEmail(user.getEmail());
     User savedUser = userRepository.save(newUser);
-
+    watchListService.createWatchlist(savedUser);
     Authentication auth = new UsernamePasswordAuthenticationToken(
             user.getEmail(),
           user.getPassword()

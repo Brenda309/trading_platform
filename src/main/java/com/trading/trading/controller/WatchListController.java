@@ -21,6 +21,8 @@ public class WatchListController {
     @Autowired
     private CoinService coinService;
 
+
+@GetMapping("/user")
     public ResponseEntity<Watchlist> getUserWatchList(
             @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserProfileByJwt(jwt);
@@ -28,8 +30,7 @@ public class WatchListController {
         return ResponseEntity.ok(watchlist);
     }
 
-    @PatchMapping("/{watchlistid}")
-
+    @GetMapping ("/{watchlistid}")
     public ResponseEntity<Watchlist> getWatchListById(
             @PathVariable Long watchListId) throws Exception{
         Watchlist watchlist = watchListService.findById(watchListId);

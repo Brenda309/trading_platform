@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/wallet")
+
 public class WallletController {
 @Autowired
     private WalletService walletService;
@@ -29,28 +29,29 @@ public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") Stri
     Wallet wallet = walletService.getUserWallet(user);
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
 }
-@PutMapping("api/wallet/${walletId}/transfer")
-public ResponseEntity<Wallet> walletToWalletTranfer(@RequestHeader("Authorization")
-                                                    String jwt,
-                                                    @PathVariable Long walletId,
-                                                    @RequestBody WalletTransaction req) throws Exception{
-  User senderUser = userService.findUserProfileByJwt(jwt);
-  Wallet recieverWallet = walletService.findWalletById(walletId);
-  Wallet wallet = walletService.walletToWalletTransfer(
-          senderUser, recieverWallet, req.getAmount());
+@PutMapping("api/wallet/{walletId}/transfer")
+public ResponseEntity<Wallet> walletToWalletTranfer(
+        @RequestHeader("Authorization") String jwt,
+        @PathVariable Long walletId,
+        @RequestBody WalletTransaction req) throws Exception{
+
+    User senderUser = userService.findUserProfileByJwt(jwt);
+    Wallet recieverWallet = walletService.findWalletById(walletId);
+    Wallet wallet = walletService.walletToWalletTransfer(
+    senderUser, recieverWallet, req.getAmount());
 
    return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
 }
 
-    @PutMapping("api/wallet/order/${orderId}/pay")
-    public ResponseEntity<Wallet> payOrderPayment(@RequestHeader("Authorization") String jwt,
-                                                  @PathVariable Long orderId,
-                                                  @RequestBody WalletTransaction req) throws Exception{
-        User user = userService.findUserProfileByJwt(jwt);
+@PutMapping("api/wallet/order/{orderId}/pay")
+public ResponseEntity<Wallet> payOrderPayment(
+        @RequestHeader("Authorization") String jwt,
+        @PathVariable Long orderId,
+        @RequestBody WalletTransaction req) throws Exception{
 
-Order order = orderService.getOrderById(orderId);
-
-Wallet wallet= walletService.payOrderPayment(order, user);
+    User user = userService.findUserProfileByJwt(jwt);
+        Order order = orderService.getOrderById(orderId);
+        Wallet wallet= walletService.payOrderPayment(order, user);
 
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }

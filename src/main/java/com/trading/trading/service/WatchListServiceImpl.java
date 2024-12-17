@@ -46,7 +46,9 @@ public class WatchListServiceImpl implements WatchListService {
 
 if (watchlist.getCoins().contains(coin)) {
     watchlist.getCoins().remove(coin);
-}else watchlist.getCoins().add(coin);
+}else
+    watchlist.getCoins().add(coin);
+watchListRepository.save(watchlist);
         return coin;
     }
 }
