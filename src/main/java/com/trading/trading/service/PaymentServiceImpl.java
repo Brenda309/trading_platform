@@ -6,6 +6,7 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.trading.trading.domain.PaymentMethod;
@@ -22,17 +23,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
-@Autowired
-private PaymentOrderRepository paymentOrderRepository;
+    @Autowired
+    private PaymentOrderRepository paymentOrderRepository;
 
-@Value("${stripe.api.key}")
-private String StripeSecretKey;
+    @Value("${stripe.api.key}")
+    private String StripeSecretKey;
 
-@Value("${razorpay.api.key}")
-private String razorpayApiKey;
+    @Value("${razorpay.api.key}")
+    private String razorpayApiKey;
 
-@Value("${razorpay.api.secret}")
-private String razorpaySecretKey;
+    @Value("${razorpay.api.secret}")
+    private String razorpaySecretKey;
 
 
     @Override
@@ -41,6 +42,7 @@ private String razorpaySecretKey;
         paymentOrder.setUser(user);
         paymentOrder.setAmount(amount);
         paymentOrder.setPaymentMethod(paymentMethod);
+        paymentOrder.setStatus(PaymentOrderStatus.PENDING);
 
         return paymentOrderRepository.save(paymentOrder);
     }
@@ -52,77 +54,95 @@ private String razorpaySecretKey;
     }
 
     @Override
-    public Boolean ProcessedPaymentOrder(PaymentOrder paymentOrder, String paymentId) throws RazorpayException {
-       if(paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)) {
-           if (paymentOrder.getPaymentMethod().equals(PaymentMethod.REZORPAY)) {
-               RazorpayClient razorpay = new RazorpayClient(razorpayApiKey, razorpaySecretKey);
-               Payment payment = razorpay.payments.fetch(paymentId);
+    public Boolean ProcessedPaymentOrder(PaymentOrder paymentOrder, String paymentId) {
+        if(paymentOrder.getStatus() == null){
+            paymentOrder.setStatus(PaymentOrderStatus.PENDING);
+        }
+        if (paymentOrder.getStatus().equals(PaymentOrderStatus.PENDING)) {
+            if (paymentOrder.getPaymentMethod().equals(PaymentMethod.STRIPE)) {
+                Stripe.apiKey = StripeSecretKey; // Set your Stripe secret key
 
-               Integer amount = payment.get("amount");
-               String status = payment.get("status");
+                try {
+                    // Fetch the payment intent from Stripe
+                    PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentId);
 
-               if (status.equals("captured")) {
-                   paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
-                   return true;
-               }
-               paymentOrder.setStatus(PaymentOrderStatus.FAILED);
-               paymentOrderRepository.save(paymentOrder);
-               return false;
-           }
-paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
-           paymentOrderRepository.save(paymentOrder);
-           return true;
-       }
+                    String status = paymentIntent.getStatus();
+                    Long amount = paymentIntent.getAmount(); // Amount is in cents
+
+                    if ("succeeded".equals(status)) {
+                        paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
+                        paymentOrderRepository.save(paymentOrder);
+                        return true;
+                    }
+
+                    paymentOrder.setStatus(PaymentOrderStatus.FAILED);
+                    paymentOrderRepository.save(paymentOrder);
+                    return false;
+
+                } catch (StripeException e) {
+                    e.printStackTrace(); // Log the exception
+                    paymentOrder.setStatus(PaymentOrderStatus.FAILED);
+                    paymentOrderRepository.save(paymentOrder);
+                    return false;
+                }
+            }
+
+            paymentOrder.setStatus(PaymentOrderStatus.SUCCESS);
+            paymentOrderRepository.save(paymentOrder);
+            return true;
+        }
         return false;
     }
 
-    @Override
-    public PaymentResponse createRazorpayPaymentLing(User user, Long amount) throws RazorpayException {
-       Long Amount = amount*100;
-       try{
-           RazorpayClient razorpay = new RazorpayClient(razorpayApiKey, razorpaySecretKey);
 
-           JSONObject paymentLinkRequest = new JSONObject();
-           paymentLinkRequest.put("amount", amount);
+
+    @Override
+    public PaymentResponse createRazorpayPaymentLing(User user, Long amount, Long order_Id) throws RazorpayException {
+        Long Amount = amount*100;
+        try{
+            RazorpayClient razorpay = new RazorpayClient(razorpayApiKey, razorpaySecretKey);
+
+            JSONObject paymentLinkRequest = new JSONObject();
+            paymentLinkRequest.put("amount", amount);
             paymentLinkRequest.put("currency", "INR");
 
             JSONObject customer = new JSONObject();
-           customer.put("name", user.getFullName());
+            customer.put("name", user.getFullName());
 
-           customer.put("email", user.getEmail());
-           paymentLinkRequest.put("customer", customer);
+            customer.put("email", user.getEmail());
+            paymentLinkRequest.put("customer", customer);
 
-           //create a JSON object with notification
+            //create a JSON object with notification
 
-           JSONObject notify = new JSONObject();
-           notify.put("email", true);
-           paymentLinkRequest.put("notify", notify);
+            JSONObject notify = new JSONObject();
+            notify.put("email", true);
+            paymentLinkRequest.put("notify", notify);
 
-           //setting reminder settings
+            //setting reminder settings
 
-           paymentLinkRequest.put("reminder_enable", true);
+            paymentLinkRequest.put("reminder_enable", true);
 
-           //set callback URL and Method
+            //set callback URL and Method
 
-           paymentLinkRequest.put("callback_url", "http://localhost:5173/wallet");
-           paymentLinkRequest.put("callback_method", "get");
+            paymentLinkRequest.put("callback_url", "http://localhost:5173/wallet");
+            paymentLinkRequest.put("callback_method", "get");
 
 
-           //create the payment link using the poymentLink.create() method
-           PaymentLink payment = razorpay.paymentLink.create(paymentLinkRequest);
+            //create the payment link using the poymentLink.create() method
+            PaymentLink payment = razorpay.paymentLink.create(paymentLinkRequest);
 
-           String paymentLinkId = payment.get("id");
-           String paymentLinkUrl = payment.get("short_url");
+            String paymentLinkId = payment.get("id");
+            String paymentLinkUrl = payment.get("short_url");
 
-           PaymentResponse res = new PaymentResponse();
-           res.setPayment_url(paymentLinkUrl);
-           return res;
+            PaymentResponse res = new PaymentResponse();
+            res.setPayment_url(paymentLinkUrl);
+            return res;
 
-       }catch (RazorpayException e){
+        }catch (RazorpayException e){
 
-System.out.println("Error creating payment link: " + e.getMessage());
-throw new RazorpayException(e.getMessage());
-       }
+            System.out.println("Error creating payment link: " + e.getMessage());
+            throw new RazorpayException(e.getMessage());
+        }
     }
 
     @Override
@@ -138,7 +158,7 @@ throw new RazorpayException(e.getMessage());
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                        .setCurrency("usd")
+                                .setCurrency("usd")
                                 .setUnitAmount(amount*100)
                                 .setProductData(SessionCreateParams
                                         .LineItem
@@ -151,11 +171,11 @@ throw new RazorpayException(e.getMessage());
                                 ).build()
                         ).build()
                 ).build();
-Session session = Session.create(params);
+        Session session = Session.create(params);
 
-System.out.println("session ____" + session);
-PaymentResponse res = new PaymentResponse();
-res.setPayment_url(session.getUrl());
+        System.out.println("session ____" + session);
+        PaymentResponse res = new PaymentResponse();
+        res.setPayment_url(session.getUrl());
 
 
         return res;

@@ -14,6 +14,6 @@ public class Wallet {
     private Long id;
     @OneToOne
     private User user;
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
 }

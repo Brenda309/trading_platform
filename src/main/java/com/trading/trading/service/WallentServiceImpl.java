@@ -23,6 +23,7 @@ public class WallentServiceImpl implements  WalletService {
         if (wallet == null) {
             wallet = new Wallet();
             wallet.setUser(user);
+            walletRepository.save(wallet);
         }
 
         return wallet;
@@ -30,10 +31,18 @@ public class WallentServiceImpl implements  WalletService {
 
     @Override
     public Wallet addBalance(Wallet wallet, Long money) {
+        if (wallet.getBalance() == null) {
+            wallet.setBalance(BigDecimal.ZERO);  // Default to 0 if balance is null
+        }
+
         BigDecimal balance = wallet.getBalance();
-    BigDecimal newBalance = balance.add(BigDecimal.valueOf(money));
-    wallet.setBalance(newBalance);
-    return (Wallet) walletRepository.save(wallet);
+        BigDecimal newBalance = balance.add(BigDecimal.valueOf(money));
+        wallet.setBalance(newBalance);
+
+        // Log the new balance for debugging
+        System.out.println("Updated wallet balance: " + newBalance);
+
+        return walletRepository.save(wallet);  // Save and return updated wallet
     }
 
     @Override

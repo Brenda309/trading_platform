@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/withdrawal")
+//@RequestMapping("/api/withdrawal")
 public class WithdrawalController {
 
     @Autowired
     private WithdrawalService withdrawalService;
 
+    @Autowired
     private WalletService walletService;
 
     @Autowired
