@@ -3,9 +3,9 @@ spring:
     name: trading
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/trading
-    username: postgres
-    password: Whatwhat45678
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USER}
+    password: ${DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
