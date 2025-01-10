@@ -149,17 +149,20 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse createStripePaymentLing(User user, Long amount, Long orderId) throws StripeException {
 
         Stripe.apiKey = StripeSecretKey;
+        String successUrl = System.getenv("STRIPE_SUCCESS_URL") + "?order_id=" + orderId;  // Success URL with dynamic order ID
+        String cancelUrl = System.getenv("STRIPE_CANCEL_URL");  // Cancel URL
 
+        // Build session parameters for Stripe checkout
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/wallet?order_id"+orderId )
-                .setCancelUrl("http://localhost:5173/payment/cancel")
+                .setSuccessUrl(successUrl)  // Use successUrl from environment
+                .setCancelUrl(cancelUrl)  // Use cancelUrl from environment
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                                 .setCurrency("usd")
-                                .setUnitAmount(amount*100)
+                                .setUnitAmount(amount * 100)
                                 .setProductData(SessionCreateParams
                                         .LineItem
                                         .PriceData
@@ -167,16 +170,19 @@ public class PaymentServiceImpl implements PaymentService {
                                         .builder()
                                         .setName("Top up wallet")
                                         .build()
-
                                 ).build()
                         ).build()
                 ).build();
+
+        // Create the Stripe session
         Session session = Session.create(params);
 
+        // Log the session for debugging
         System.out.println("session ____" + session);
+
+        // Prepare and return the response
         PaymentResponse res = new PaymentResponse();
         res.setPayment_url(session.getUrl());
-
 
         return res;
     }

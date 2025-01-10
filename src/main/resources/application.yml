@@ -3,9 +3,9 @@ spring:
     name: trading
 
   datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USER}
-    password: ${DATASOURCE_PASSWORD}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/trading}
+    username: ${DATASOURCE_USER:postgres}
+    password: ${DATASOURCE_PASSWORD:defaultpassword}
 
   jpa:
     hibernate:
@@ -24,15 +24,19 @@ server:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework: DEBUG
+    com.trading: DEBUG
+
 
 
 
 stripe:
   api:
-    key: sk_test_51PKgYvIBgeEIZAi80XZOWAAo4rm7WTrxZsDqkTJ1SexOlwZrWc13njmTbmm7vBGdYf8k4RTroM6qEg1uAtd1vMfb0059jiBsRC
+    key: ${API_KEY:default_api_key}
 
 
 razorpay:
   api:
     key: razorpay api key
     secret: razorpay api secret
+

@@ -1,8 +1,6 @@
 package com.trading.trading.model;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.trading.trading.domain.USER_ROLE;
-import com.trading.trading.model.TwoFactorAuth;
 import jakarta.persistence.*;
 import lombok.Data;
 
